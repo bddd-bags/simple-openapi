@@ -1,0 +1,1545 @@
+openapi: 3.0.0
+info:
+  title: SUIT GAME
+  description: RESTFULL API SUIT-GAME
+  termsOfService: https://swagger.io/resources/open-api/
+  contact:
+    name: Aditya Bagaskara
+    url: https://github.com/bddd-bags
+    email: adityabagaskara019@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: "{{baseUrl}}/api"
+  description: Mock Server
+security:
+- bearerToken: []
+paths:
+  /v1/register:
+    post:
+      tags:
+      - Authentication
+      summary: Create new account
+      description: Endpoint to create Account
+      operationId: v1RegisterPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEntity'
+            examples:
+              admin:
+                description: create user with role admin
+                value:
+                  username: admin
+                  encryptedPassword: admin
+                  roleId: 1
+              player:
+                description: create user with role player
+                value:
+                  username: player
+                  encryptedPassword: player
+                  roleId: 2
+        required: true
+      responses:
+        "201":
+          description: Success Create a new User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+              examples:
+                admin:
+                  $ref: '#/components/examples/user/value/admin'
+                player:
+                  $ref: '#/components/examples/user/value/player'
+        "422":
+          description: Failed to register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_422'
+      security: []
+      x-swagger-router-controller: Authentication
+  /v1/login:
+    post:
+      tags:
+      - Authentication
+      summary: Login to get access token
+      description: Endpoint to get accessToken
+      operationId: v1LoginPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEntity'
+            examples:
+              admin:
+                description: Login as admin
+                value:
+                  username: admin
+                  encryptedPassword: admin
+              player:
+                description: Login as player
+                value:
+                  username: player
+                  encryptedPassword: player
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+              examples:
+                admin:
+                  description: succes login as admin
+                  value:
+                    id: 1
+                    username: admin
+                    role: 1
+                    data:
+                      accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOjEsIm5hbWUiOiJhZG1pbiIsInJvbGVJZCI6MSwiaWF0IjoxNTE2MjM5MDIyfQ.AgnCtqeSFeZXd4gENTrWxLxMHHawPcoqUJ0IwNpe1YM
+                      refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOjEsIm5hbWUiOiJhZG1pbiIsInJvbGVJZCI6MSwiaWF0IjoxNTE2MjM5MDIyfQ.AgnCtqeSFeZXd4gENTrWxLxMHHawPcoqUJ0IwNpe1YM
+                      expiresAt: 80000000
+                player:
+                  description: succes login as player
+                  value:
+                    id: 2
+                    username: player
+                    role: 2
+                    data:
+                      accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOjIsIm5hbWUiOiJwbGF5ZXIiLCJyb2xlSWQiOjIsImlhdCI6MTUxNjIzOTAyMn0.OZ-a4DF71WDicjpR-1Sg76zOObbzvWQE0ex7q_mxDho
+                      refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOjIsIm5hbWUiOiJwbGF5ZXIiLCJyb2xlSWQiOjIsImlhdCI6MTUxNjIzOTAyMn0.OZ-a4DF71WDicjpR-1Sg76zOObbzvWQE0ex7q_mxDho
+                      expiresAt: 80000000
+        "401":
+          description: Email and Password Bad credential response body schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+      security: []
+      x-swagger-router-controller: Authentication
+  /v1/users/:id/biodata:
+    get:
+      tags:
+      - User
+      summary: View biodata byId
+      description: Endpoint to view biodata byId
+      operationId: v1UsersidBiodataGET
+      parameters:
+      - name: getUserId
+        in: path
+        description: getId for update Biodata
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+        examples:
+          admin:
+            description: id for admin
+            value: 1
+          player:
+            description: id for player
+            value: 2
+      responses:
+        "200":
+          description: Success get biodata by :id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiodataEntity'
+              examples:
+                admin:
+                  $ref: '#/components/examples/userBiodatas/value/admin'
+                player:
+                  $ref: '#/components/examples/userBiodatas/value/player'
+        "404":
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+      x-swagger-router-controller: User
+    put:
+      tags:
+      - User
+      summary: Edit userBiodata
+      description: Endpoint to edit userBiodata
+      operationId: v1UsersidBiodataPUT
+      parameters:
+      - name: getUserId
+        in: path
+        description: getId for update Biodata
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+        examples:
+          admin:
+            description: id for admin
+            value: 1
+          player:
+            description: id for player
+            value: 2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BiodataEntity'
+            examples:
+              admin:
+                description: Biodata for admin
+                value:
+                  userId: 1
+                  avatarUrl: saitama.jpg
+                  bio: Lorem Ipsum dolor sit amet
+                  phoneNumber: 62080090808
+                  address: dimana-mana hatiku senang
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+              player:
+                description: Biodata for admin
+                value:
+                  userId: 2
+                  avatarUrl: saitama.jpg
+                  bio: Lorem Ipsum dolor sit amet
+                  phoneNumber: 62080090808
+                  address: di kota kembang
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+        required: true
+      responses:
+        "200":
+          description: Success Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiodataEntity'
+              examples:
+                admin:
+                  $ref: '#/components/examples/userBiodatas/value/admin'
+                player:
+                  $ref: '#/components/examples/userBiodatas/value/player'
+        "404":
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+      x-swagger-router-controller: User
+  /v1/players:
+    get:
+      tags:
+      - Player
+      summary: Get player by Point and Level
+      description: Endpoint to get player by Point and level
+      operationId: v1PlayersGET
+      parameters:
+      - name: point
+        in: query
+        description: get point player
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: level
+        in: query
+        description: get level player
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              example:
+                status: OK
+                data:
+                - id: 1
+                  username: Bambang
+                  point: 150
+                  level: NOVICE
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                - id: 1
+                  username: Jokowi
+                  point: 40000
+                  level: GRAND MASTER
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                - id: 1
+                  username: Kaesang
+                  point: 3500
+                  level: CANDIDATE MASTER
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Player
+  /v1/join-room/:roomId:
+    post:
+      tags:
+      - Player
+      summary: Join in the room
+      description: Endpoint to join in the room
+      operationId: v1Join_roomroomIdPOST
+      parameters:
+      - name: getRoomId
+        in: path
+        description: getId Room
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: SUCCESS CREATED ROOM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+              example:
+                status: OK
+                data:
+                  userId: 2
+                  roomId:
+                    id: 1
+                    name: room1
+                    masterId: 1
+                    isActive: true
+                    rounds:
+                    - id: 1
+                      status: PLAYER_1_TURN
+                    - id: 2
+                    - id: 3
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                message: "please input your option in endpoint {{baseUrl}}/api/games/:roomId"
+        "404":
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+      x-swagger-router-controller: Player
+  /v1/games/:roomId:
+    post:
+      tags:
+      - Player
+      summary: the player chooses his choice
+      description: Endpoint player chooses his choice
+      operationId: v1GamesroomIdPOST
+      parameters:
+      - name: getRoomId
+        in: path
+        description: getId Room
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+          example: "1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userRounds'
+            examples:
+              ROCK:
+                description: options ROCK
+                value:
+                  gameOptionId: 1
+              PAPER:
+                description: options PAPER
+                value:
+                  gameOptionId: 2
+              SCISSORS:
+                description: options SCISSORS
+                value:
+                  gameOptionId: 1
+        required: true
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRounds'
+              examples:
+                Player 1:
+                  $ref: '#/components/examples/userRounds/value/player1'
+                Player 2:
+                  $ref: '#/components/examples/userRounds/value/player2'
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Player
+  /v1/game/:id/round:
+    get:
+      tags:
+      - Player
+      summary: Get game and round byId player
+      description: Endpoint to get game and room byId player
+      operationId: v1GameidRoundGET
+      parameters:
+      - name: getIdPlayer
+        in: path
+        description: getId for update Biodata
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+        examples:
+          Player 1:
+            description: id for Player 1
+            value: 2
+          player:
+            description: id for Player 2
+            value: 3
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRounds'
+              examples:
+                Player 1:
+                  $ref: '#/components/examples/getUserRound/value/player1'
+                Player 2:
+                  $ref: '#/components/examples/getUserRound/value/player2'
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Player
+  /v1/users:
+    get:
+      tags:
+      - Admin
+      summary: Get all Users
+      description: Endpoint to get all users
+      operationId: v1UsersGET
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiodataEntity'
+              example:
+                status: OK
+                data:
+                - userId:
+                    id: 1
+                    username: admin
+                    encryptedPassword: 21232f297a57a5a743894a0e4a801fc3
+                    roleId: 1
+                  avatarUrl: saitama.jpg
+                  bio: Lorem Ipsum dolor sit amet
+                  phoneNumber: 62858552244556
+                  address: dimana-mana hatiku senang
+                - userId:
+                    id: 2
+                    username: player1
+                    encryptedPassword: 912af0dff974604f1321254ca8ff38b6
+                    roleId: 2
+                  avatarUrl: saitama.jpg
+                  bio: Lorem Ipsum dolor sit amet
+                  phoneNumber: 62858552244556
+                  address: dimana-mana hatiku senang
+                - userId:
+                    id: 3
+                    username: player2
+                    encryptedPassword: 912af0dff974604f1321254ca8ff38b6
+                    roleId: 2
+                  avatarUrl: narutooo.jpg
+                  bio: Lorem Ipsum dolor sit amet
+                  phoneNumber: 62858552244556
+                  address: KonoHagakure
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Admin
+  /v1/user/:id:
+    delete:
+      tags:
+      - Admin
+      summary: Delete User
+      description: Endpoint to delete user
+      operationId: v1UseridDELETE
+      parameters:
+      - name: getUserId
+        in: path
+        description: getId for update Biodata
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+        examples:
+          admin:
+            description: id for admin
+            value: 1
+          player:
+            description: id for player
+            value: 2
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        "404":
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+      x-swagger-router-controller: Admin
+  /v1/room/:roomId:
+    delete:
+      tags:
+      - Player
+      summary: Delete Room
+      description: Endpoint to delete room
+      operationId: v1RoomroomIdDELETE
+      parameters:
+      - name: getRoomId
+        in: path
+        description: getId Room
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minLength: 1
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        "404":
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+      x-swagger-router-controller: Player
+  /v1/rooms:
+    get:
+      tags:
+      - Admin
+      - Player
+      summary: Get all Rooms and active Room
+      description: Endpoint to get all rooms and Get an active room
+      operationId: v1RoomsGET
+      parameters:
+      - name: isActive
+        in: query
+        description: Get active room
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: true
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomEntity'
+              examples:
+                All Rooms:
+                  $ref: '#/components/examples/Rooms/value/rooms'
+                Room Active:
+                  $ref: '#/components/examples/Rooms/value/roomIsActive'
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Admin
+    post:
+      tags:
+      - Player
+      summary: Create a new room
+      description: Endpoint to create a new room
+      operationId: v1RoomsPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomEntity'
+            example:
+              name: room1
+        required: true
+      responses:
+        "201":
+          description: SUCCESS CREATED ROOM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+              example:
+                status: OK
+                data:
+                  userId:
+                    id: 1
+                  roomId:
+                    id: 1
+                    name: room1
+                    masterId: 1
+                    isActive: true
+                    rounds:
+                    - id: 1
+                      status: PLAYER_1_TURN
+                    - id: 2
+                    - id: 3
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                message: "please input your option in endpoint {{baseUrl}}/api/games/:roomId"
+        "422":
+          description: Failed to create room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_422_1'
+      x-swagger-router-controller: Player
+  /v1/games:
+    get:
+      tags:
+      - Admin
+      summary: Get all Games
+      description: Endpoint to get all Games
+      operationId: v1GamesGET
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRounds'
+              example:
+                status: OK
+                data:
+                - roundId:
+                    id: 1
+                    status: PLAYER_2_TURN
+                    roomId: 1
+                  userId: 1
+                  gameOptionId: 1
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                - roundId:
+                    id: 1
+                    status: FINISHED
+                    winnerId: 2
+                    roomId: 1
+                  userId: 2
+                  gameOptionId: 2
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+                - roundId:
+                    id: 2
+                    status: PLAYER_2_TURN
+                    roomId: 1
+                  userId: 1
+                  gameOptionId: 2
+                  createdAt: 2021-12-04T13:44:40.747Z
+                  updatedAt: 2021-12-04T13:44:40.747Z
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Admin
+  /v1/rounds:
+    get:
+      tags:
+      - Admin
+      summary: Get all rounds
+      description: Endpoint to get all rounds
+      operationId: v1RoundsGET
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoundEntity'
+              example:
+                status: OK
+                data:
+                - id: 1
+                  status: FINISHED
+                  winnerId: 2
+                  roomId: 1
+                - id: 2
+                  status: PLAYER_2_TURN
+                  roomId: 1
+                - id: 3
+                  status: PLAYER_1_TURN
+                  roomId: 1
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Admin
+  /v1/room/inviting:
+    post:
+      tags:
+      - Player
+      summary: Inviting player 2
+      description: Endpoint to inviting player 2
+      operationId: v1RoomInvitingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/room_inviting_body'
+        required: true
+      responses:
+        "201":
+          description: SUCCES
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+              examples:
+                DEFAULT:
+                  $ref: '#/components/examples/playerInviting/value/default'
+                PLAYER ACCEPT:
+                  $ref: '#/components/examples/playerInviting/value/playerRespondOK'
+                PLAYER REJECT:
+                  $ref: '#/components/examples/playerInviting/value/playerRespondReject'
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+      x-swagger-router-controller: Player
+components:
+  schemas:
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        encryptedPassword:
+          type: string
+        roleId:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        roleId: 6
+        id: 0
+        username: username
+        encryptedPassword: encryptedPassword
+        updatedAt: updatedAt
+    BiodataEntity:
+      type: object
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserEntity'
+        avatarUrl:
+          type: string
+        bio:
+          type: string
+        phoneNumber:
+          type: integer
+        address:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        phoneNumber: 0
+        address: address
+        avatarUrl: avatarUrl
+        bio: bio
+        userId:
+          createdAt: createdAt
+          roleId: 6
+          id: 0
+          username: username
+          encryptedPassword: encryptedPassword
+          updatedAt: updatedAt
+        updatedAt: updatedAt
+    UserRooms:
+      type: object
+      properties:
+        userId:
+          $ref: '#/components/schemas/UserEntity'
+        roomId:
+          $ref: '#/components/schemas/UserEntity'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        userId:
+          createdAt: createdAt
+          roleId: 6
+          id: 0
+          username: username
+          encryptedPassword: encryptedPassword
+          updatedAt: updatedAt
+        roomId: null
+        updatedAt: updatedAt
+    RoomEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        masterId:
+          $ref: '#/components/schemas/UserEntity'
+        winnerId:
+          type: integer
+        roundCount:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        masterId: null
+        roundCount: 5
+        createdAt: createdAt
+        winnerId: 1
+        name: name
+        id: 6
+        isActive: true
+        updatedAt: updatedAt
+    RoundEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum:
+          - PLAYER_1_TURN
+          - PLAYER_2_TURN
+          - FINISHED
+        winnerId:
+          $ref: '#/components/schemas/UserEntity'
+        roomId:
+          $ref: '#/components/schemas/RoomEntity'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        winnerId:
+          createdAt: createdAt
+          roleId: 6
+          id: 0
+          username: username
+          encryptedPassword: encryptedPassword
+          updatedAt: updatedAt
+        id: 0
+        roomId:
+          masterId: null
+          roundCount: 5
+          createdAt: createdAt
+          winnerId: 1
+          name: name
+          id: 6
+          isActive: true
+          updatedAt: updatedAt
+        status: PLAYER_1_TURN
+        updatedAt: updatedAt
+    userRounds:
+      type: object
+      properties:
+        roundId:
+          $ref: '#/components/schemas/RoundEntity'
+        userId:
+          $ref: '#/components/schemas/UserEntity'
+        gameOptionId:
+          $ref: '#/components/schemas/gameOptionsEntity'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        gameOptionId:
+          inferiorId: 7
+          createdAt: createdAt
+          name: ROCK
+          id: 5
+          superiorId: 2
+          updatedAt: updatedAt
+        roundId:
+          createdAt: createdAt
+          winnerId:
+            createdAt: createdAt
+            roleId: 6
+            id: 0
+            username: username
+            encryptedPassword: encryptedPassword
+            updatedAt: updatedAt
+          id: 0
+          roomId:
+            masterId: null
+            roundCount: 5
+            createdAt: createdAt
+            winnerId: 1
+            name: name
+            id: 6
+            isActive: true
+            updatedAt: updatedAt
+          status: PLAYER_1_TURN
+          updatedAt: updatedAt
+        userId: null
+        updatedAt: updatedAt
+    gameOptionsEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          enum:
+          - ROCK
+          - PAPER
+          - SCISSORS
+        superiorId:
+          type: integer
+        inferiorId:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        inferiorId: 7
+        createdAt: createdAt
+        name: ROCK
+        id: 5
+        superiorId: 2
+        updatedAt: updatedAt
+    UserStatsEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          $ref: '#/components/schemas/UserEntity'
+        levelId:
+          $ref: '#/components/schemas/LevelsEntity'
+        point:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    LevelsEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        minPoint:
+          type: integer
+        maxPoint:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    inline_response_422:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        data:
+          $ref: '#/components/schemas/inline_response_422_data'
+    inline_response_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        data:
+          $ref: '#/components/schemas/inline_response_401_data'
+    inline_response_404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        data:
+          $ref: '#/components/schemas/inline_response_404_data'
+    inline_response_200:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        point:
+          type: integer
+        level:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        level: level
+        id: 0
+        point: 6
+        username: username
+        updatedAt: updatedAt
+    inline_response_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        message:
+          type: string
+          example: BAD_REQUEST!
+    inline_response_200_1:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          $ref: '#/components/schemas/UserRooms'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        data:
+          createdAt: createdAt
+          userId:
+            createdAt: createdAt
+            roleId: 6
+            id: 0
+            username: username
+            encryptedPassword: encryptedPassword
+            updatedAt: updatedAt
+          roomId: null
+          updatedAt: updatedAt
+        status: status
+        updatedAt: updatedAt
+    inline_response_200_2:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        message:
+          type: string
+          example: SUCCESS_DELETED
+      example:
+        message: SUCCESS_DELETED
+        status: OK
+    inline_response_422_1:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+        data:
+          $ref: '#/components/schemas/inline_response_422_1_data'
+    room_inviting_body:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: room4
+    inline_response_201:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        name:
+          type: string
+        masterId:
+          type: integer
+        winnerId:
+          type: integer
+        roundCount:
+          type: integer
+        isActive:
+          type: boolean
+      example:
+        masterId: 1
+        roundCount: 5
+        winnerId: 5
+        name: name
+        id: 0
+        isActive: true
+        userId: 6
+    inline_response_422_data:
+      type: object
+      properties:
+        name:
+          type: string
+          example: FAILED_TO_REGISTER
+        message:
+          type: string
+          example: Email already exists!
+    inline_response_401_data:
+      type: object
+      properties:
+        name:
+          type: string
+          example: FAILED_TO_LOGIN
+        message:
+          type: string
+          enum:
+          - Wrong Password!
+          - Wrong Email!
+    inline_response_404_data:
+      type: object
+      properties:
+        message:
+          type: string
+          example: ID_NOT_FOUND!
+    inline_response_422_1_data:
+      type: object
+      properties:
+        name:
+          type: string
+          example: FAILED_TO_CREATE_ROOM
+        message:
+          type: string
+          example: Room Name already exists!
+  responses:
+    emailAlreadyExist:
+      description: Failed to register
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_422'
+    roomNameAlreadyExist:
+      description: Failed to create room
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_422_1'
+    CredentialErrorResponse:
+      description: Email and Password Bad credential response body schema
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_401'
+    idNotFound:
+      description: Id not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_404'
+    roomOK:
+      description: SUCCESS CREATED ROOM
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200_1'
+          example:
+            status: OK
+            data:
+              userId:
+                id: 1
+              roomId:
+                id: 1
+                name: room1
+                masterId: 1
+                isActive: true
+                rounds:
+                - id: 1
+                  status: PLAYER_1_TURN
+                - id: 2
+                - id: 3
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            message: "please input your option in endpoint {{baseUrl}}/api/games/:roomId"
+    joinRoomOK:
+      description: SUCCESS CREATED ROOM
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200_1'
+          example:
+            status: OK
+            data:
+              userId: 2
+              roomId:
+                id: 1
+                name: room1
+                masterId: 1
+                isActive: true
+                rounds:
+                - id: 1
+                  status: PLAYER_1_TURN
+                - id: 2
+                - id: 3
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            message: "please input your option in endpoint {{baseUrl}}/api/games/:roomId"
+    RoomsOK:
+      description: SUCCESS
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoomEntity'
+          examples:
+            All Rooms:
+              $ref: '#/components/examples/Rooms/value/rooms'
+            Room Active:
+              $ref: '#/components/examples/Rooms/value/roomIsActive'
+    PlayerStatsOK:
+      description: SUCCESS
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+          example:
+            status: OK
+            data:
+            - id: 1
+              username: Bambang
+              point: 150
+              level: NOVICE
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - id: 1
+              username: Jokowi
+              point: 40000
+              level: GRAND MASTER
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - id: 1
+              username: Kaesang
+              point: 3500
+              level: CANDIDATE MASTER
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+    BadRequest:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+  parameters:
+    getId:
+      name: getUserId
+      in: path
+      description: getId for update Biodata
+      required: true
+      style: simple
+      explode: false
+      schema:
+        minLength: 1
+        type: string
+      examples:
+        admin:
+          description: id for admin
+          value: 1
+        player:
+          description: id for player
+          value: 2
+    getIdRoom:
+      name: getRoomId
+      in: path
+      description: getId Room
+      required: true
+      style: simple
+      explode: false
+      schema:
+        minLength: 1
+        type: string
+        example: "1"
+  examples:
+    user:
+      description: OK
+      value:
+        admin:
+          description: user as admin
+          value:
+            username: admin
+            encryptedPassword: 21232f297a57a5a743894a0e4a801fc3
+            createdAt: 2021-12-04T13:44:40.747Z
+            updatedAt: 2021-12-04T13:44:40.747Z
+        player:
+          description: user as player
+          value:
+            id: 2
+            username: player
+            encryptedPassword: 912af0dff974604f1321254ca8ff38b6
+            createdAt: 2021-12-04T13:44:40.747Z
+            updatedAt: 2021-12-04T13:44:40.747Z
+    userBiodatas:
+      description: OK
+      value:
+        admin:
+          description: Biodata for admin
+          value:
+            status: OK
+            data:
+              userId:
+                id: 1
+                username: admin
+                encryptedPassword: 21232f297a57a5a743894a0e4a801fc3
+                roleId: 1
+              avatarUrl: saitama.jpg
+              bio: Lorem Ipsum dolor sit amet
+              phoneNumber: 62858552244556
+              address: dimana-mana hatiku senang
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+        player:
+          description: Biodata for player
+          value:
+            status: OK
+            data:
+              userId:
+                id: 2
+                username: player
+                encryptedPassword: 912af0dff974604f1321254ca8ff38b6
+                roleId: 2
+              avatarUrl: saitama.jpg
+              bio: Lorem Ipsum dolor sit amet
+              phoneNumber: 62858552244556
+              address: dimana-mana hatiku senang
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+    userRounds:
+      description: OK
+      value:
+        player1:
+          description: Player 1 input option
+          value:
+            roundId:
+              id: 1
+              status: PLAYER_2_TURN
+              roomId: 1
+            userId: 1
+            gameOptionId: 1
+            createdAt: 2021-12-04T13:44:40.747Z
+            updatedAt: 2021-12-04T13:44:40.747Z
+        player2:
+          description: Player 2 input option
+          value:
+            roundId:
+              id: 1
+              status: FINISHED
+              winnerId: 2
+              roomId: 1
+            userId: 1
+            gameOptionId: 2
+            createdAt: 2021-12-04T13:44:40.747Z
+            updatedAt: 2021-12-04T13:44:40.747Z
+    getUserRound:
+      description: OK
+      value:
+        player1:
+          description: SUCCESS
+          value:
+            status: OK
+            data:
+            - roundId: 1
+              userId: 2
+              gameOptionId: 2
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - roundId: 1
+              userId: 2
+              gameOptionId: 1
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - roundId: 2
+              userId: 2
+              gameOptionId: 2
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+        player2:
+          description: SUCCESS
+          value:
+            status: OK
+            data:
+            - roundId: 1
+              userId: 3
+              gameOptionId: 1
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - roundId: 1
+              userId: 3
+              gameOptionId: 1
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - roundId: 2
+              userId: 3
+              gameOptionId: 2
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+    playerInviting:
+      description: OK
+      value:
+        default:
+          description: OK
+          value:
+            status: OK
+            data:
+              id: 4
+              userId: 3
+              name: room4
+              masterId: 2
+              isActive: true
+            message: Waiting for respond player 2
+        playerRespondOK:
+          description: OK
+          value:
+            status: YOU_HAVE_JOINED
+            data:
+              id: 4
+              userId: 3
+              name: room4
+              masterId: 2
+              isActive: true
+              rounds:
+              - id: 1
+                status: PLAYER_1_TURN
+              - id: 2
+              - id: 3
+            message: "please input your option in endpoint {{baseUrl}}/api/games/:roomId"
+        playerRespondReject:
+          description: OK
+          value:
+            status: OK
+            data:
+              id: 4
+              userId: 3
+              name: room4
+              masterId: 2
+              isActive: false
+            message: ROOM_DISABLED
+    Rooms:
+      description: SUCCESS
+      value:
+        rooms:
+          description: OK
+          value:
+            status: OK
+            data:
+            - id: 1
+              name: room1
+              masterId: 1
+              winnerId: 2
+              roundCount: 3
+              isActive: false
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - id: 2
+              name: room1
+              masterId: 2
+              roundCount: 1
+              isActive: true
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+        roomIsActive:
+          description: OK
+          value:
+            status: OK
+            data:
+            - id: 1
+              name: Skuyy
+              masterId: 2
+              roundCount: 2
+              isActive: true
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - id: 2
+              name: Joinnn
+              masterId: 2
+              roundCount: 1
+              isActive: true
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+            - id: 3
+              name: KERASSS
+              masterId: 3
+              roundCount: 1
+              isActive: true
+              createdAt: 2021-12-04T13:44:40.747Z
+              updatedAt: 2021-12-04T13:44:40.747Z
+  securitySchemes:
+    bearerToken:
+      type: http
+      description: Authorization with JWT
+      scheme: bearer
+      bearerFormat: JWT
